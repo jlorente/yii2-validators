@@ -1,0 +1,19 @@
+{
+    "name": "jlorente/yii2-behaviors",
+    "description": "A compilation of useful validators for the Yii2 framework.",
+    "keywords": ["yii2", "validator", "color", "redactor"],
+    "homepage": "https://github.com/jlorente/yii2-validators",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jose Lorente Martin",
+            "email": "jose.lorente.martin@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "jlorente\\validators\\": "src/"
+        }
+    }
+}
