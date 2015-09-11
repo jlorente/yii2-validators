@@ -1,7 +1,7 @@
 {
-    "name": "jlorente/yii2-behaviors",
+    "name": "jlorente/yii2-validators",
     "description": "A compilation of useful validators for the Yii2 framework.",
-    "keywords": ["yii2", "validator", "color", "redactor"],
+    "keywords": ["yii2", "validator", "richtext", "address", "color", "name"],
     "homepage": "https://github.com/jlorente/yii2-validators",
     "type": "yii2-extension",
     "license": "MIT",
