@@ -26,4 +26,18 @@ class ColorValidator extends RegularExpressionValidator {
      */
     public $pattern = '/^#[a-f0-9]{6}$/';
 
+    /**
+     * Returns a random color.
+     * 
+     * @return string
+     */
+    public static function randColor() {
+        $c = '#';
+        $i = 0;
+        while ($i++ < 3) {
+            $c .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        }
+        return $c;
+    }
+
 }
