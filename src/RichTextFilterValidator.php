@@ -27,9 +27,8 @@ class RichTextFilterValidator extends FilterValidator {
     public function init() {
         $this->filter = function($value) {
             $value = strip_tags($value, $this->allowedTags);
-            return RedactorHtmlPurifier::process($value);
+            return RichTextPurifier::process($value);
         };
-
         parent::init();
     }
 
