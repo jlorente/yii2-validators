@@ -1,8 +1,9 @@
 <?php
 
 /**
- * @author      José Lorente <jl@bytebox.es>
- * @copyright   Gabinete Jurídico y de Transportes <https://portalabogados.es>
+ * @author      José Lorente <jose.lorente.martin@gmail.com>
+ * @license     The MIT License (MIT)
+ * @copyright   José Lorente
  * @version     1.0
  */
 
@@ -13,11 +14,9 @@ use yii\validators\Validator;
 use Traversable;
 
 /**
- * DateValidator verifies if the attribute represents a date, time or datetime in a proper format.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @author Carsten Brandt <mail@cebe.cc>
- * @since 2.0
+ * CollectionValidator validates arrays and Traversable objects of the same type.
+ * 
+ * @author José Lorente <jose.lorente.martin@gmail.com>
  */
 class CollectionValidator extends Validator {
 
