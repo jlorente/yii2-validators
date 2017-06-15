@@ -107,9 +107,9 @@ class NifValidator extends RegularExpressionValidator {
             return [$this->messages['patternError'], []];
         }
         $split = [];
-        preg_match_all('/[0-9]+|[A-Z]+/' . $this->caseInsensitive === true ? 'i' : '', $value, $split);
+        preg_match_all('/[0-9]+|[A-Z]+/' . ($this->caseInsensitive === true ? 'i' : ''), $value, $split);
         $nSplit = count($split);
-        $numberPosition = $nSplit - $this->withLetter === true ? 2 : 1;
+        $numberPosition = $nSplit - ($this->withLetter === true ? 2 : 1);
         $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? static::$nieLeadingLetters[$split[0]] : '') . $split[$numberPosition]);
         $letter = static::$table[$number % 23];
         if ($this->withLetter === true && $letter !== $split[$numberPosition + 1]) {
