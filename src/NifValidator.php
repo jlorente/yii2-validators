@@ -108,9 +108,10 @@ class NifValidator extends RegularExpressionValidator {
         }
         $split = [];
         preg_match_all('/[0-9]+|[A-Z]+/' . ($this->caseInsensitive === true ? 'i' : ''), $value, $split);
+        $split = $split[0];
         $nSplit = count($split);
         $numberPosition = $nSplit - ($this->withLetter === true ? 2 : 1);
-        $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? static::$nieLeadingLetters[$split[0]] : '') . $split[$numberPosition]);
+        $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? array_search($split[0], static::$nieLeadingLetters) : '') . $split[$numberPosition]);
         $letter = static::$table[$number % 23];
         if ($this->withLetter === true && $letter !== $split[$numberPosition + 1]) {
             return [$this->messages['controlDigitError'], []];
@@ -163,12 +164,15 @@ JS;
      * Ensures the format of the validator.
      */
     protected function ensureValidators() {
-        $std = '[0-9]{8}';
-        $nie = '[XYZ]{1}[0-9]{7}';
+        $std = '^[0-9]{8}';
+        $nie = '^[XYZ]{1}[0-9]{7}';
         if ($this->withLetter) {
             $letters = implode('', static::$table);
-            $std .= '[' . $letters . ']{1}';
-            $nie .= '[' . $letters . ']{1}';
+            $std .= '[' . $letters . ']{1}$';
+            $nie .= '[' . $letters . ']{1}$';
+        } else {
+            $std .= '$';
+            $nie .= '$';
         }
         if ($this->allowNie === true) {
             $std .= '|' . $nie;
