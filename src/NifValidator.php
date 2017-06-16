@@ -43,15 +43,15 @@ class NifValidator extends RegularExpressionValidator {
      * 
      * @var boolean
      */
-    public $withLetter = true;
+    public $withDC = true;
 
     /**
-     * If withLetter is false and setLetter is true, the NIF will be returned 
+     * If withDC is false and setDC is true, the NIF will be returned 
      * with the corresponding letter.
      * 
      * @var boolean
      */
-    public $setLetter = false;
+    public $setDC = false;
 
     /**
      * Validates also NIE.
@@ -110,12 +110,12 @@ class NifValidator extends RegularExpressionValidator {
         preg_match_all('/[0-9]+|[A-Z]+/' . ($this->caseInsensitive === true ? 'i' : ''), $value, $split);
         $split = $split[0];
         $nSplit = count($split);
-        $numberPosition = $nSplit - ($this->withLetter === true ? 2 : 1);
+        $numberPosition = $nSplit - ($this->withDC === true ? 2 : 1);
         $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? array_search($split[0], static::$nieLeadingLetters) : '') . $split[$numberPosition]);
         $letter = static::$table[$number % 23];
-        if ($this->withLetter === true && $letter !== $split[$numberPosition + 1]) {
+        if ($this->withDC === true && $letter !== $split[$numberPosition + 1]) {
             return [$this->messages['controlDigitError'], []];
-        } elseif ($this->setLetter === true) {
+        } elseif ($this->setDC === true) {
             $split[$numberPosition + 1] = $letter;
         }
         $this->_value = implode('', $split);
@@ -130,7 +130,7 @@ class NifValidator extends RegularExpressionValidator {
         $nieDigits = Json::encode(static::$nieLeadingLetters);
         $errorMessage = Json::encode($this->messages['controlDigitError']);
         $js = parent::clientValidateAttribute($model, $attribute, $view);
-        if ($this->withLetter === true) {
+        if ($this->withDC === true) {
             $js .= <<<JS
 (function() {
     if (value.length) {
@@ -166,7 +166,7 @@ JS;
     protected function ensureValidators() {
         $std = '^[0-9]{8}';
         $nie = '^[XYZ]{1}[0-9]{7}';
-        if ($this->withLetter) {
+        if ($this->withDC) {
             $letters = implode('', static::$table);
             $std .= '[' . $letters . ']{1}$';
             $nie .= '[' . $letters . ']{1}$';
