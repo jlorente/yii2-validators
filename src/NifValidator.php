@@ -123,6 +123,15 @@ class NifValidator extends RegularExpressionValidator {
     }
 
     /**
+     * Gets the value after validation.
+     * 
+     * @return string
+     */
+    public function getNewValue() {
+        return $this->_value;
+    }
+    
+    /**
      * @inheritdoc
      */
     public function clientValidateAttribute($model, $attribute, $view) {
