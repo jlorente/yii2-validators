@@ -114,6 +114,8 @@ class CifValidator extends RegularExpressionValidator {
         $dc = (string) $dcNumber;
         if (array_search($organization, static::$organization['char']) !== false) {
             $dc = static::$table[$dcNumber];
+        } elseif ($dcNumber === 10) {
+            $dc = "0";
         }
         if ($this->withDC === true && $dc !== substr($value, -1)) {
             return [$this->messages['controlDigitError'], []];
@@ -156,6 +158,8 @@ class CifValidator extends RegularExpressionValidator {
         dc = dcNumber.toString();
         if (tableOrg.char.indexOf(org) !== -1) {
             dc = tableDC[dcNumber];
+        } else if (dcNumber === 10) {
+            dc = "0";
         }
         if (dc !== value.substr(-1)) {
             yii.validation.addMessage(messages, $errorMessage, value);
