@@ -112,6 +112,7 @@ class NifValidator extends RegularExpressionValidator {
         $nSplit = count($split);
         $numberPosition = $nSplit - ($this->withDC === true ? 2 : 1);
         $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? array_search($split[0], static::$nieLeadingLetters) : '') . $split[$numberPosition]);
+        $number = !$number ? 0 : $number;
         $letter = static::$table[$number % 23];
         if ($this->withDC === true && $letter !== $split[$numberPosition + 1]) {
             return [$this->messages['controlDigitError'], []];

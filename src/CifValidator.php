@@ -138,17 +138,17 @@ class CifValidator extends RegularExpressionValidator {
             $js .= <<<JS
 (function() {
     if (value.length) {
-        var org, number, sum = 0, i, dcNumber, dc, tableOrg, tableDC, n, aux;
+        var org, number, sum = 0, i, j, dcNumber, dc, tableOrg, tableDC, n, aux;
         tableOrg = $organization;
         tableDC = $table;
         org = value.substr(0, 1);
         number = value.substr(1, 7);
-        for (i = 0; i < number.length; ++i) {
+        for (i = 0; i < number.length; i += 1) {
             n = parseInt(number[i]);
             if (i % 2 === 0) {
                 n = 0;
                 aux = (number[i] * 2).toString();
-                for (var j in aux) {
+                for (j = 0; j < aux.length; j += 1) {
                     n += parseInt(aux[j]);
                 }
             }
