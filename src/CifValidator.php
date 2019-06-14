@@ -18,14 +18,23 @@ use yii\validators\RegularExpressionValidator;
  *
  * @author José Lorente <jose.lorente.martin@gmail.com>
  */
-class CifValidator extends RegularExpressionValidator {
+class CifValidator extends RegularExpressionValidator
+{
 
+    /**
+     * Organization - Leading letter table
+     * 
+     * @var string
+     */
     protected static $organization = [
         'int' => [
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'U', 'V',
+            'A', 'B', 'E', 'H',
         ]
         , 'char' => [
             'N', 'P', 'Q', 'R', 'S', 'W'
+        ]
+        , 'other' => [
+            'C', 'D', 'F', 'G', 'J', 'K', 'L', 'M', 'U', 'V'
         ]
     ];
 
@@ -74,7 +83,8 @@ class CifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function init() {
+    public function init()
+    {
         $this->ensureValidators();
         $this->ensureMessages();
         parent::init();
@@ -83,7 +93,8 @@ class CifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function validateAttribute($model, $attribute) {
+    public function validateAttribute($model, $attribute)
+    {
         $result = $this->validateValue($model->$attribute);
         if (!empty($result)) {
             $this->addError($model, $attribute, $result[0], $result[1]);
@@ -94,7 +105,8 @@ class CifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function validateValue($value) {
+    public function validateValue($value)
+    {
         $valid = parent::validateValue($value);
         if ($valid !== null) {
             return [$this->messages['patternError'], []];
@@ -111,16 +123,19 @@ class CifValidator extends RegularExpressionValidator {
             $sum += $n;
         }
         $dcNumber = 10 - ($sum % 10);
-        $dc = (string) $dcNumber;
+        $dc = $dcAlt = (string) $dcNumber;
         if (array_search($organization, static::$organization['char']) !== false) {
             $dc = static::$table[$dcNumber];
+        } elseif (array_search($organization, static::$organization['other']) !== false) {
+            $dcAlt = static::$table[$dcNumber];
         } elseif ($dcNumber === 10) {
             $dc = "0";
         }
+
         if ($this->withDC === true && $dc !== substr($value, -1)) {
             return [$this->messages['controlDigitError'], []];
         } elseif ($this->setDC === true) {
-            $value .= $dc;
+            $value .= is_numeric($dcAlt) === false ? $dcAlt : $dc;
         }
         $this->_value = $value;
         return;
@@ -129,7 +144,8 @@ class CifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function clientValidateAttribute($model, $attribute, $view) {
+    public function clientValidateAttribute($model, $attribute, $view)
+    {
         $organization = Json::encode(static::$organization);
         $table = Json::encode(static::$table);
         $errorMessage = Json::encode($this->messages['controlDigitError']);
@@ -138,7 +154,7 @@ class CifValidator extends RegularExpressionValidator {
             $js .= <<<JS
 (function() {
     if (value.length) {
-        var org, number, sum = 0, i, j, dcNumber, dc, tableOrg, tableDC, n, aux;
+        var org, number, sum = 0, i, j, dcNumber, dc, dcAlt, tableOrg, tableDC, n, aux;
         tableOrg = $organization;
         tableDC = $table;
         org = value.substr(0, 1);
@@ -156,12 +172,16 @@ class CifValidator extends RegularExpressionValidator {
         }
         dcNumber = 10 - (sum % 10);
         dc = dcNumber.toString();
+        dcAlt = dc;
         if (tableOrg.char.indexOf(org) !== -1) {
             dc = tableDC[dcNumber];
+        } else if (tableOrg.other.indexOf(org) !== -1) {
+            dcAlt = tableDC[dcNumber];
         } else if (dcNumber === 10) {
             dc = "0";
         }
-        if (dc !== value.substr(-1)) {
+
+        if (dc !== value.substr(-1) && dcAlt !== value.substr(-1)) {
             yii.validation.addMessage(messages, $errorMessage, value);
         }
     }
@@ -174,7 +194,8 @@ JS;
     /**
      * Ensures the error messages of the validator.
      */
-    protected function ensureMessages() {
+    protected function ensureMessages()
+    {
         $patternError = 'The valid format for CIF is a letter followed by 7 digits';
         if ($this->withDC === true) {
             $patternError .= ' and an ending control digit';
@@ -189,16 +210,20 @@ JS;
     /**
      * Ensures the format of the validator.
      */
-    protected function ensureValidators() {
+    protected function ensureValidators()
+    {
         $intTable = implode('', static::$organization['int']);
         $charTable = implode('', static::$organization['char']);
+        $otherTable = implode('', static::$organization['other']);
         $int = "[$intTable]{1}[0-9]{7}";
         $char = "[$charTable]{1}[0-9]{7}";
+        $other = "[$otherTable]{1}[0-9]{7}";
         if ($this->withDC) {
             $int .= '[0-9]{1}';
             $char .= '[0A-J]{1}';
+            $other .= '[0-9A-J]{1}';
         }
-        $this->pattern = "/^$int$|^$char$/" . ($this->caseInsensitive === true ? 'i' : '');
+        $this->pattern = "/^$int$|^$char$|^$other$/" . ($this->caseInsensitive === true ? 'i' : '');
     }
 
     /**
@@ -207,7 +232,8 @@ JS;
      * @param string $value
      * @return array
      */
-    protected function extractParts($value) {
+    protected function extractParts($value)
+    {
         $split = [
             substr($value, 0, 1)
             , substr($value, 1, 7)
