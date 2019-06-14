@@ -132,7 +132,7 @@ class CifValidator extends RegularExpressionValidator
             $dc = "0";
         }
 
-        if ($this->withDC === true && $dc !== substr($value, -1)) {
+        if ($this->withDC === true && in_array(substr($value, -1), [$dc, $dcAlt]) === false) {
             return [$this->messages['controlDigitError'], []];
         } elseif ($this->setDC === true) {
             $value .= is_numeric($dcAlt) === false ? $dcAlt : $dc;
@@ -140,7 +140,7 @@ class CifValidator extends RegularExpressionValidator
         $this->_value = $value;
         return;
     }
-    
+
     /**
      * Gets the value after validation.
      * 
@@ -150,7 +150,7 @@ class CifValidator extends RegularExpressionValidator
     {
         return $this->_value;
     }
-    
+
     /**
      * @inheritdoc
      */
