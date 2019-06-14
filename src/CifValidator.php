@@ -140,7 +140,17 @@ class CifValidator extends RegularExpressionValidator
         $this->_value = $value;
         return;
     }
-
+    
+    /**
+     * Gets the value after validation.
+     * 
+     * @return string
+     */
+    public function getNewValue()
+    {
+        return $this->_value;
+    }
+    
     /**
      * @inheritdoc
      */
