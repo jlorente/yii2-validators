@@ -123,14 +123,15 @@ class CifValidator extends RegularExpressionValidator
             $sum += $n;
         }
         $dcNumber = 10 - ($sum % 10);
-        $dc = $dcAlt = (string) $dcNumber;
         if (array_search($organization, static::$organization['char']) !== false) {
-            $dc = static::$table[$dcNumber];
+            $dc = $dcAlt = static::$table[$dcNumber];
         } elseif (array_search($organization, static::$organization['other']) !== false) {
-            $dcAlt = static::$table[$dcNumber];
+            $dc = static::$table[$dcNumber];
+            $dcAlt = $dcNumber === 10 ? '0' : (string) $dcNumber;
+        } else {
+            $dc = $dcAlt = $dcNumber === 10 ? '0' : (string) $dcNumber;
         }
-        $dc = $dcNumber === 10 ? '0' : $dc;
-
+        
         if ($this->withDC === true && in_array(substr($value, -1), [$dc, $dcAlt]) === false) {
             return [$this->messages['controlDigitError'], []];
         } elseif ($this->setDC === true) {
@@ -180,15 +181,14 @@ class CifValidator extends RegularExpressionValidator
             sum += n;
         }
         dcNumber = 10 - (sum % 10);
-        dc = dcNumber.toString();
-        dcAlt = dc;
         if (tableOrg.char.indexOf(org) !== -1) {
-            dc = tableDC[dcNumber];
+            dc = dcAlt = tableDC[dcNumber];
         } else if (tableOrg.other.indexOf(org) !== -1) {
-            dcAlt = tableDC[dcNumber];
+            dc = tableDC[dcNumber];
+            dcAlt = dcNumber === 10 ? '0' : dcNumber.toString();
+        } else {
+            dc = dcAlt = dcNumber === 10 ? '0' : dcNumber.toString();
         }
-                    
-        dc = dcNumber === 10 ? '0' : dcNumber.toString();
 
         if (dc !== value.substr(-1) && dcAlt !== value.substr(-1)) {
             yii.validation.addMessage(messages, $errorMessage, value);
