@@ -18,7 +18,8 @@ use yii\validators\RegularExpressionValidator;
  *
  * @author José Lorente <jose.lorente.martin@gmail.com>
  */
-class NifValidator extends RegularExpressionValidator {
+class NifValidator extends RegularExpressionValidator
+{
 
     /**
      * Control digit table.
@@ -81,7 +82,8 @@ class NifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function init() {
+    public function init()
+    {
         $this->ensureValidators();
         $this->ensureMessages();
         parent::init();
@@ -90,7 +92,8 @@ class NifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function validateAttribute($model, $attribute) {
+    public function validateAttribute($model, $attribute)
+    {
         $result = $this->validateValue($model->$attribute);
         if (!empty($result)) {
             $this->addError($model, $attribute, $result[0], $result[1]);
@@ -101,7 +104,8 @@ class NifValidator extends RegularExpressionValidator {
     /**
      * @inheritdoc
      */
-    public function validateValue($value) {
+    public function validateValue($value)
+    {
         $valid = parent::validateValue($value);
         if ($valid !== null) {
             return [$this->messages['patternError'], []];
@@ -112,7 +116,6 @@ class NifValidator extends RegularExpressionValidator {
         $nSplit = count($split);
         $numberPosition = $nSplit - ($this->withDC === true ? 2 : 1);
         $number = preg_replace('/^[0]+/', '', ($nSplit > 2 ? array_search($split[0], static::$nieLeadingLetters) : '') . $split[$numberPosition]);
-        $number = !$number ? 0 : $number;
         $letter = static::$table[$number % 23];
         if ($this->withDC === true && $letter !== $split[$numberPosition + 1]) {
             return [$this->messages['controlDigitError'], []];
@@ -128,22 +131,26 @@ class NifValidator extends RegularExpressionValidator {
      * 
      * @return string
      */
-    public function getNewValue() {
+    public function getNewValue()
+    {
         return $this->_value;
     }
-    
+
     /**
      * @inheritdoc
      */
-    public function clientValidateAttribute($model, $attribute, $view) {
+    public function clientValidateAttribute($model, $attribute, $view)
+    {
         $table = Json::encode(static::$table);
         $nieDigits = Json::encode(static::$nieLeadingLetters);
         $errorMessage = Json::encode($this->messages['controlDigitError']);
+        $typeAttribute = $model->formName() . "[last_name]";
+
         $js = parent::clientValidateAttribute($model, $attribute, $view);
         if ($this->withDC === true) {
             $js .= <<<JS
 (function() {
-    if (value.length) {
+    if (value.length) {                    
         var split, nSplit, number, cLetter;
         split = value.match(/(\d+|[^\d]+)/g);
         nSplit = split.length;
@@ -162,7 +169,8 @@ JS;
     /**
      * Ensures the error messages of the validator.
      */
-    protected function ensureMessages() {
+    protected function ensureMessages()
+    {
         $this->messages = array_merge([
             'controlDigitError' => Yii::t('yii', 'The letter don\'t correspond to the number.')
             , 'patternError' => Yii::t('yii', 'The valid format for NIF is 8 digits followed by a valid letter and for NIE a letter followed by 7 digits and an ending letter.')
@@ -173,7 +181,8 @@ JS;
     /**
      * Ensures the format of the validator.
      */
-    protected function ensureValidators() {
+    protected function ensureValidators()
+    {
         $std = '^[0-9]{8}';
         $nie = '^[XYZ]{1}[0-9]{7}';
         if ($this->withDC) {
