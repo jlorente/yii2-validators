@@ -284,7 +284,7 @@ class DocumentTypeValidator extends RegularExpressionValidator
         $table = Json::encode(static::$table);
         $nieDigits = Json::encode(static::$nieLeadingLetters);
         $errorMessage = Json::encode($this->messages['controlDigitError']);
-        $typeAttribute = $model->formName() . "[{$this->documentTypeAttribute}]";
+        $typeAttribute = $this->documentTypeAttribute;
         $organization = Json::encode(static::$organization);
         $cifTable = Json::encode(static::$cifTable);
 
@@ -308,15 +308,17 @@ class DocumentTypeValidator extends RegularExpressionValidator
         $js = null;
         if ($this->withDC === true) {
             $js = <<<JS
-(function() {
+(function(attribute, value, messages, deferred, \$form) {
     var regExps = $regularExpression;
     var split, nSplit, number, cLetter;
-
+    
     if (!value.length) {
         return;
     }
-                    
-    var type = parseInt(\$form.find('[name="$typeAttribute"]').val());
+                   
+    var documentInputName = \$form.find('#' + attribute.id).attr('name');
+    var typeInputName = documentInputName.substr(0, documentInputName.lastIndexOf('[')) + '[$typeAttribute]';
+    var type = parseInt(\$form.find('[name="' + typeInputName + '"]').val());
     if (!type) {
         return;
     }
@@ -390,7 +392,7 @@ class DocumentTypeValidator extends RegularExpressionValidator
             break;
     }
                     
-})();
+})(attribute, value, messages, deferred, \$form);
 JS;
         }
         return $js;
