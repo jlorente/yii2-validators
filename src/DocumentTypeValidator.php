@@ -263,6 +263,7 @@ class DocumentTypeValidator extends RegularExpressionValidator
             return [$this->messages['patternErrorDefault'], []];
         }
 
+        $this->_value = $value;
         return;
     }
 
